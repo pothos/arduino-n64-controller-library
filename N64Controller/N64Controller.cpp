@@ -143,8 +143,6 @@ void N64Controller::N64_init_PINB(char pincode) {
 void N64Controller::N64_PIND_send(char pincode, unsigned char *buffer, char length) {
     // Send these bytes
     char bits;
-    
-    bool bit;
 
     // This routine is very carefully timed by examining the assembly output.
     // Do not change any statements, it could throw the timings off
@@ -256,7 +254,6 @@ inner_loop:
 
 void N64Controller::N64_PINB_send(char pincode, unsigned char *buffer, char length) {
     char bits;
-    bool bit;
     asm volatile (";Starting outer for loop");
 outer_loop:
     {
@@ -404,7 +401,6 @@ read_loop:
 
 void N64Controller::print_N64_status()
 {
-    int i;
     // bits: A, B, Z, Start, Dup, Ddown, Dleft, Dright
     // bits: 0, 0, L, R, Cup, Cdown, Cleft, Cright
     Serial.println();
@@ -495,7 +491,6 @@ void N64Controller::translate_raw_data()
 }
 
 void N64Controller::update() {
-  unsigned char data, addr;
   unsigned char command[] = {0x01};
   if (n64_first_register) {
     noInterrupts();
