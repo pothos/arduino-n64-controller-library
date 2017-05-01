@@ -14,31 +14,10 @@
 #define N64_PINB_LOW DDRB |= pincode
 #define N64_PINB_QUERY (PINB & pincode)
 
-void N64Controller::set_up() {
-  n64_PIN = 2; // might also be set/changed by constructor or begin() afterwards
-  n64_key_Dup = false;
-  n64_key_Ddown = false;
-  n64_key_Dleft = false;
-  n64_key_Dright = false;
-  n64_key_Start = false;
-  n64_key_Z = false;
-  n64_key_A = false;
-  n64_key_B = false;
-  n64_key_Cup = false;
-  n64_key_Cdown = false;
-  n64_key_Cleft = false;
-  n64_key_Cright = false;
-  n64_key_L = false;
-  n64_key_R = false;
-  n64_key_X = 0;
-  n64_key_Y = 0;
+N64Controller::N64Controller() {
 }
 
-N64Controller::N64Controller() {
-  set_up();
-}
 N64Controller::N64Controller(int serialPin) {
-  set_up();
   n64_PIN = serialPin;
 }
 void N64Controller::begin(int serialPin) {
@@ -89,7 +68,6 @@ void N64Controller::begin() {
   } else {
     N64_init_PINB(n64_pincode);
   }
-  translate_raw_data();
 }
 
 void N64Controller::N64_init_PIND(char pincode) {
@@ -405,89 +383,44 @@ void N64Controller::print_N64_status()
     // bits: 0, 0, L, R, Cup, Cdown, Cleft, Cright
     Serial.println();
     Serial.print("Start: ");
-    Serial.println(N64_status.data1 & 16 ? 1:0);
+    Serial.println(Start());
 
     Serial.print("Z:     ");
-    Serial.println(N64_status.data1 & 32 ? 1:0);
+    Serial.println(Z());
 
     Serial.print("B:     ");
-    Serial.println(N64_status.data1 & 64 ? 1:0);
+    Serial.println(B());
 
     Serial.print("A:     ");
-    Serial.println(N64_status.data1 & 128 ? 1:0);
+    Serial.println(A());
 
     Serial.print("L:     ");
-    Serial.println(N64_status.data2 & 32 ? 1:0);
+    Serial.println(L());
     Serial.print("R:     ");
-    Serial.println(N64_status.data2 & 16 ? 1:0);
+    Serial.println(R());
 
     Serial.print("Cup:   ");
-    Serial.println(N64_status.data2 & 0x08 ? 1:0);
+    Serial.println(C_up());
     Serial.print("Cdown: ");
-    Serial.println(N64_status.data2 & 0x04 ? 1:0);
+    Serial.println(C_down());
     Serial.print("Cright:");
-    Serial.println(N64_status.data2 & 0x01 ? 1:0);
+    Serial.println(C_right());
     Serial.print("Cleft: ");
-    Serial.println(N64_status.data2 & 0x02 ? 1:0);
+    Serial.println(C_left());
     
     Serial.print("Dup:   ");
-    Serial.println(N64_status.data1 & 0x08 ? 1:0);
+    Serial.println(D_up());
     Serial.print("Ddown: ");
-    Serial.println(N64_status.data1 & 0x04 ? 1:0);
+    Serial.println(D_down());
     Serial.print("Dright:");
-    Serial.println(N64_status.data1 & 0x01 ? 1:0);
+    Serial.println(D_right());
     Serial.print("Dleft: ");
-    Serial.println(N64_status.data1 & 0x02 ? 1:0);
+    Serial.println(D_left());
 
     Serial.print("Stick X:");
-    Serial.println(N64_status.stick_x, DEC);
+    Serial.println(axis_x(), DEC);
     Serial.print("Stick Y:");
-    Serial.println(N64_status.stick_y, DEC);
-}
-
-void N64Controller::translate_raw_data()
-{
-    // The get_N64_status function sloppily dumps its data 1 bit per byte
-    // into the get_status_extended char array. It's our job to go through
-    // that and put each piece neatly into the struct N64_status
-    int i;
-    memset(&N64_status, 0, sizeof(N64_status));
-    // line 1
-    // bits: A, B, Z, Start, Dup, Ddown, Dleft, Dright
-    for (i=0; i<8; i++) {
-        N64_status.data1 |= N64_raw_dump[i] ? (0x80 >> i) : 0;
-    }
-    // line 2
-    // bits: 0, 0, L, R, Cup, Cdown, Cleft, Cright
-    for (i=0; i<8; i++) {
-        N64_status.data2 |= N64_raw_dump[8+i] ? (0x80 >> i) : 0;
-    }
-    // line 3
-    // bits: joystick x value
-    // These are 8 bit values centered at 0x80 (128)
-    for (i=0; i<8; i++) {
-        N64_status.stick_x |= N64_raw_dump[16+i] ? (0x80 >> i) : 0;
-    }
-    for (i=0; i<8; i++) {
-        N64_status.stick_y |= N64_raw_dump[24+i] ? (0x80 >> i) : 0;
-    }
-    
-    n64_key_A = (bool)N64_raw_dump[0];
-    n64_key_B = (bool)N64_raw_dump[1];
-    n64_key_Z = (bool)N64_raw_dump[2];
-    n64_key_Start = (bool)N64_raw_dump[3];
-    n64_key_Dup = (bool)N64_raw_dump[4];
-    n64_key_Ddown = (bool)N64_raw_dump[5];
-    n64_key_Dleft = (bool)N64_raw_dump[6];
-    n64_key_Dright = (bool)N64_raw_dump[7];
-    n64_key_L = (bool)N64_raw_dump[10];
-    n64_key_R = (bool)N64_raw_dump[11];
-    n64_key_Cup = (bool)N64_raw_dump[12];
-    n64_key_Cdown = (bool)N64_raw_dump[13];
-    n64_key_Cleft = (bool)N64_raw_dump[14];
-    n64_key_Cright = (bool)N64_raw_dump[15];
-    n64_key_X = (int) N64_status.stick_x;
-    n64_key_Y = (int) N64_status.stick_y;
+    Serial.println(axis_y(), DEC);
 }
 
 void N64Controller::update() {
@@ -503,5 +436,4 @@ void N64Controller::update() {
     N64_PINB_get(n64_pincode);
     interrupts();
   }
-  translate_raw_data();
 }

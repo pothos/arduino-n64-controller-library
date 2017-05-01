@@ -22,6 +22,22 @@
 #ifndef N64Controller_h
 #define N64Controller_h
 
+#define A_IDX       0
+#define B_IDX       1
+#define Z_IDX       2
+#define START_IDX   3
+#define D_UP_IDX    4
+#define D_DOWN_IDX  5
+#define D_LEFT_IDX  6
+#define D_RIGHT_IDX 7
+#define L_IDX       10
+#define R_IDX       11
+#define C_UP_IDX    12
+#define C_DOWN_IDX  13
+#define C_LEFT_IDX  14
+#define C_RIGHT_IDX 15
+#define X_IDX    16
+#define Y_IDX    24
 
 class N64Controller {
   public:
@@ -32,22 +48,22 @@ class N64Controller {
     void update();                    // then update always and get button info
                                       // consider to have a delay instead of
                                       // calling update all the time in a loop
-    inline bool button_D_up() { return n64_key_Dup; };
-    inline bool button_D_down() { return n64_key_Ddown; };
-    inline bool button_D_left() { return n64_key_Dleft; };
-    inline bool button_D_right() { return n64_key_Dright; };
-    inline bool button_Start() { return n64_key_Start; };
-    inline bool button_A() { return n64_key_A; };
-    inline bool button_B() { return n64_key_B; };
-    inline bool button_Z() { return n64_key_Z; };
-    inline bool button_L() { return n64_key_L; };
-    inline bool button_R() { return n64_key_R; };
-    inline bool button_C_up() { return n64_key_Cup; };
-    inline bool button_C_down() { return n64_key_Cdown; };
-    inline bool button_C_left() { return n64_key_Cleft; };
-    inline bool button_C_right() { return n64_key_Cright; };
-    inline int axis_x() { return n64_key_X; };
-    inline int axis_y() { return n64_key_Y; };
+    inline bool D_up() { return (N64_raw_dump[D_UP_IDX]) > 0; };
+    inline bool D_down() { return (N64_raw_dump[D_DOWN_IDX]) > 0; };
+    inline bool D_left() { return (N64_raw_dump[D_LEFT_IDX]) > 0; };
+    inline bool D_right() { return (N64_raw_dump[D_RIGHT_IDX]) > 0; };
+    inline bool Start() { return (N64_raw_dump[START_IDX]) > 0; };
+    inline bool A() { return (N64_raw_dump[A_IDX]) > 0; };
+    inline bool B() { return (N64_raw_dump[B_IDX]) > 0; };
+    inline bool Z() { return (N64_raw_dump[Z_IDX]) > 0; };
+    inline bool L() { return (N64_raw_dump[L_IDX]) > 0; };
+    inline bool R() { return (N64_raw_dump[R_IDX]) > 0; };
+    inline bool C_up() { return (N64_raw_dump[C_UP_IDX]) > 0; };
+    inline bool C_down() { return (N64_raw_dump[C_DOWN_IDX]) > 0; };
+    inline bool C_left() { return (N64_raw_dump[C_LEFT_IDX]) > 0; };
+    inline bool C_right() { return (N64_raw_dump[C_RIGHT_IDX]) > 0; };
+    inline char axis_x() { return axis(X_IDX); };
+    inline char axis_y() { return axis(Y_IDX); };
     
     void print_N64_status();
   private:
@@ -55,23 +71,7 @@ class N64Controller {
     int n64_PIN; // might also be set by constructor or begin()
     char n64_pincode;
     bool n64_first_register; // PIN0-7: DDRD PIN8-13: DDRB
-    bool n64_key_Dup;
-    bool n64_key_Ddown;
-    bool n64_key_Dleft;
-    bool n64_key_Dright;
-    bool n64_key_Start;
-    bool n64_key_Z;
-    bool n64_key_A;
-    bool n64_key_B;
-    bool n64_key_Cup;
-    bool n64_key_Cdown;
-    bool n64_key_Cleft;
-    bool n64_key_Cright;
-    bool n64_key_L;
-    bool n64_key_R;
-    int n64_key_X;
-    int n64_key_Y;
-    
+
     void N64_init_PIND(char pincode);
     void N64_PIND_send(char pincode, unsigned char *buffer, char length);
     void N64_PIND_get(char pincode);
@@ -79,19 +79,15 @@ class N64Controller {
     void N64_init_PINB(char pincode);
     void N64_PINB_send(char pincode, unsigned char *buffer, char length);
     void N64_PINB_get(char pincode);
-    
-    void translate_raw_data();
-    
-    // 8 bytes of data that we get from the controller
-    struct {
-    // bits: 0, 0, 0, start, y, x, b, a
-    unsigned char data1;
-    // bits: 1, L, R, Z, Dup, Ddown, Dright, Dleft
-    unsigned char data2;
-    char stick_x;
-    char stick_y;
-    } N64_status;
-    
+
+    inline char axis(int index) {
+      char value = 0;
+      for (char i=0; i<8; i++) {
+          value |= N64_raw_dump[index+i] ? (0x80 >> i) : 0;
+      }
+      return value;
+    }
+
     char N64_raw_dump[33]; // 1 received bit per byte
 };
 
