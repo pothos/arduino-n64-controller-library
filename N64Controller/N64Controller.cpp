@@ -3,6 +3,15 @@
 #include <Arduino.h>
 #include "pins_arduino.h"
 
+#define NOP asm volatile ("nop")
+#define NOP5 asm volatile ("nop\nnop\nnop\nnop\nnop\n")
+#define NOP30 asm volatile ("nop\nnop\nnop\nnop\nnop\n" \
+                              "nop\nnop\nnop\nnop\nnop\n" \
+                              "nop\nnop\nnop\nnop\nnop\n" \
+                              "nop\nnop\nnop\nnop\nnop\n" \
+                              "nop\nnop\nnop\nnop\nnop\n" \
+                              "nop\nnop\nnop\nnop\nnop\n")
+
 // these two macros set arduino pin 2 to input or output, which with an
 // external 1K pull-up resistor to the 3.3V rail, is like pulling it high or
 // low.  These operations translate to 1 op code, which takes 2 cycles
@@ -149,7 +158,7 @@ inner_loop:
                 // 1 bit
                 // remain low for 1us, then go high for 3us
                 // nop block 1
-                asm volatile ("nop\nnop\nnop\nnop\nnop\n");
+                NOP5;
                 
                 asm volatile (";Setting line to high");
                 N64_PIND_HIGH;
@@ -157,27 +166,14 @@ inner_loop:
                 // nop block 2
                 // we'll wait only 2us to sync up with both conditions
                 // at the bottom of the if statement
-                asm volatile ("nop\nnop\nnop\nnop\nnop\n"  
-                              "nop\nnop\nnop\nnop\nnop\n"  
-                              "nop\nnop\nnop\nnop\nnop\n"  
-                              "nop\nnop\nnop\nnop\nnop\n"  
-                              "nop\nnop\nnop\nnop\nnop\n"  
-                              "nop\nnop\nnop\nnop\nnop\n"  
-                              );
+                NOP30;
 
             } else {
                 asm volatile (";Bit is a 0");
                 // 0 bit
                 // remain low for 3us, then go high for 1us
                 // nop block 3
-                asm volatile ("nop\nnop\nnop\nnop\nnop\n"  
-                              "nop\nnop\nnop\nnop\nnop\n"  
-                              "nop\nnop\nnop\nnop\nnop\n"  
-                              "nop\nnop\nnop\nnop\nnop\n"  
-                              "nop\nnop\nnop\nnop\nnop\n"  
-                              "nop\nnop\nnop\nnop\nnop\n"  
-                              "nop\nnop\nnop\nnop\nnop\n"  
-                              "nop\n");
+                NOP30; NOP5; NOP;
 
                 asm volatile (";Setting line to high");
                 N64_PIND_HIGH;
@@ -195,8 +191,8 @@ inner_loop:
             if (bits != 0) {
                 // nop block 4
                 // this block is why a for loop was impossible
-                asm volatile ("nop\nnop\nnop\nnop\nnop\n"  
-                              "nop\nnop\nnop\nnop\n");
+                NOP5; NOP; NOP; NOP; NOP;
+
                 // rotate bits
                 asm volatile (";rotating out bits");
                 *buffer <<= 1;
@@ -222,9 +218,8 @@ inner_loop:
     // wait 1 us, 16 cycles, then raise the line 
     // 16-2=14
     // nop block 6
-    asm volatile ("nop\nnop\nnop\nnop\nnop\n"
-                  "nop\nnop\nnop\nnop\nnop\n"  
-                  "nop\nnop\nnop\nnop\n");
+    NOP5; NOP5; NOP; NOP; NOP; NOP;
+
     N64_PIND_HIGH;
 
 }
@@ -244,26 +239,13 @@ inner_loop:
             asm volatile (";branching");
             if (*buffer >> 7) {
                 asm volatile (";Bit is a 1");
-                asm volatile ("nop\nnop\nnop\nnop\nnop\n");
+                NOP5;
                 asm volatile (";Setting line to high");
                 N64_PINB_HIGH;
-                asm volatile ("nop\nnop\nnop\nnop\nnop\n"  
-                              "nop\nnop\nnop\nnop\nnop\n"  
-                              "nop\nnop\nnop\nnop\nnop\n"  
-                              "nop\nnop\nnop\nnop\nnop\n"  
-                              "nop\nnop\nnop\nnop\nnop\n"  
-                              "nop\nnop\nnop\nnop\nnop\n"  
-                              );
+                NOP30;
             } else {
                 asm volatile (";Bit is a 0");
-                asm volatile ("nop\nnop\nnop\nnop\nnop\n"  
-                              "nop\nnop\nnop\nnop\nnop\n"  
-                              "nop\nnop\nnop\nnop\nnop\n"  
-                              "nop\nnop\nnop\nnop\nnop\n"  
-                              "nop\nnop\nnop\nnop\nnop\n"  
-                              "nop\nnop\nnop\nnop\nnop\n"  
-                              "nop\nnop\nnop\nnop\nnop\n"  
-                              "nop\n");
+                NOP30; NOP5; NOP;
 
                 asm volatile (";Setting line to high");
                 N64_PINB_HIGH;
@@ -272,8 +254,7 @@ inner_loop:
             asm volatile (";finishing inner loop body");
             --bits;
             if (bits != 0) {
-                asm volatile ("nop\nnop\nnop\nnop\nnop\n"  
-                              "nop\nnop\nnop\nnop\n");
+                NOP5; NOP; NOP; NOP; NOP;
                 asm volatile (";rotating out bits");
                 *buffer <<= 1;
                 goto inner_loop;
@@ -286,11 +267,9 @@ inner_loop:
             goto outer_loop;
         }
     }
-    asm volatile ("nop\nnop\nnop\nnop\n");
+    NOP; NOP; NOP; NOP;
     N64_PINB_LOW;
-    asm volatile ("nop\nnop\nnop\nnop\nnop\n"
-                  "nop\nnop\nnop\nnop\nnop\n"  
-                  "nop\nnop\nnop\nnop\n");
+    NOP5; NOP5; NOP; NOP; NOP; NOP;
     N64_PINB_HIGH;
 }
 
@@ -316,14 +295,7 @@ read_loop:
             return;
     }
     // wait approx 2us and poll the line
-    asm volatile (
-                  "nop\nnop\nnop\nnop\nnop\n"  
-                  "nop\nnop\nnop\nnop\nnop\n"  
-                  "nop\nnop\nnop\nnop\nnop\n"  
-                  "nop\nnop\nnop\nnop\nnop\n"  
-                  "nop\nnop\nnop\nnop\nnop\n"  
-                  "nop\nnop\nnop\nnop\nnop\n"  
-            );
+    NOP30;
     *bitbin = N64_PIND_QUERY;
     ++bitbin;
     --bitcount;
@@ -355,14 +327,7 @@ read_loop:
         if (!--timeout)
             return;
     }
-    asm volatile (
-                  "nop\nnop\nnop\nnop\nnop\n"  
-                  "nop\nnop\nnop\nnop\nnop\n"  
-                  "nop\nnop\nnop\nnop\nnop\n"  
-                  "nop\nnop\nnop\nnop\nnop\n"  
-                  "nop\nnop\nnop\nnop\nnop\n"  
-                  "nop\nnop\nnop\nnop\nnop\n"  
-            );
+    NOP30;
     *bitbin = N64_PINB_QUERY;
     ++bitbin;
     --bitcount;
