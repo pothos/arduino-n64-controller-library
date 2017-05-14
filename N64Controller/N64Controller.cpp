@@ -9,42 +9,12 @@ N64Controller::N64Controller(unsigned char serialPin) {
   // Don't remove these lines, we don't want to push +5V to the controller
   digitalWrite(serialPin, LOW);
   pinMode(serialPin, INPUT);
-  bool n64_first_register = true;
-  char n64_pincode;
-  switch (serialPin) {
-    case 0: n64_pincode = 0x01;
-            break;
-    case 1: n64_pincode = 0x02;
-            break;
-    case 2: n64_pincode = 0x04;
-            break;
-    case 3: n64_pincode = 0x08;
-            break;
-    case 4: n64_pincode = 0x10;
-            break;
-    case 5: n64_pincode = 0x20;
-            break;
-    case 6: n64_pincode = 0x40;
-            break;
-    case 7: n64_pincode = 0x80;
-            break;
-    case 8: n64_pincode = 0x01; n64_first_register = false;
-            break;
-    case 9: n64_pincode = 0x02; n64_first_register = false;
-            break;
-    case 10: n64_pincode = 0x04; n64_first_register = false;
-             break;
-    case 11: n64_pincode = 0x08; n64_first_register = false;
-             break;
-    case 12: n64_pincode = 0x10; n64_first_register = false;
-             break;
-    case 13: n64_pincode = 0x20; n64_first_register = false;
-             break;
-    default:
-            n64_pincode = 0x04;
-            break;
-  }
-  if(n64_first_register) {
+
+  // 0-7: DDRD, 8-13: DDRB
+  bool isDDRD = (serialPin / 8) == 0;
+  char n64_pincode = 0x01 << (serialPin % 8);
+
+  if(isDDRD) {
       interface = new N64Interface_PIND(n64_pincode);
   } else {
       interface = new N64Interface_PINB(n64_pincode);
