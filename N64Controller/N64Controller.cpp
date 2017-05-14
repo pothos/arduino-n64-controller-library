@@ -23,16 +23,12 @@
 #define N64_PINB_LOW DDRB |= pincode
 #define N64_PINB_QUERY (PINB & pincode)
 
-N64Controller::N64Controller() {
+N64Controller::N64Controller(unsigned char serialPin) {
+  if(serialPin > 13)
+    serialPin = 2;
+  n64_PIN = serialPin;
 }
 
-N64Controller::N64Controller(int serialPin) {
-  n64_PIN = serialPin;
-}
-void N64Controller::begin(int serialPin) {
-  n64_PIN = serialPin;
-  begin();
-}
 void N64Controller::begin() {
   // Communication with N64 controller controller on this pin
   // Don't remove these lines, we don't want to push +5V to the controller

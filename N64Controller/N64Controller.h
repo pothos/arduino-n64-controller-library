@@ -41,9 +41,7 @@
 
 class N64Controller {
   public:
-    N64Controller();
-    N64Controller(int serialPin); // first thing to call
-    void begin(int serialPin);
+    N64Controller(unsigned char serialPin); // first thing to call
     void begin();                     // second thing to call
     void update();                    // then update always and get button info
                                       // consider to have a delay instead of
@@ -68,7 +66,7 @@ class N64Controller {
     void print_N64_status();
   private:
     void set_up();
-    int n64_PIN; // might also be set by constructor or begin()
+    char n64_PIN; // might also be set by constructor or begin()
     char n64_pincode;
     bool n64_first_register; // PIN0-7: DDRD PIN8-13: DDRB
 
