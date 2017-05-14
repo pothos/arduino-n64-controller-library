@@ -48,7 +48,7 @@ Default and fallback PIN is 2
 
 ## Authors
 
-Gamecube controller to Nintendo 64 adapter
+* Gamecube controller to Nintendo 64 adapter
  by Andrew Brown
-Rewritten for N64 to HID by Peter Den Hartog
-Modified to be a library with selectable pins by Kai Lüke
+* Rewritten for N64 to HID by Peter Den Hartog
+* Modified to be a library with selectable pins by Kai Lüke
