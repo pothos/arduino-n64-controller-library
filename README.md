@@ -19,9 +19,9 @@ void setup() {
 void loop() {
     delay(30);
     player1.update(); // read key state
-    if (player1.button_A() && player1.button_D_down()
-        || player1.button_Start()) { // has no deeper meaning ;)
-        int xachse = player1.axis_x(); // can be negative oder positive
+    if (player1.A() && player1.D_down()
+        || player1.Start()) { // has no deeper meaning ;)
+        int xaxis = player1.axis_x(); // can be negative oder positive
                                    // regarding to orientation of the analog stick
     }
     // …
