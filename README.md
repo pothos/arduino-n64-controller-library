@@ -1,8 +1,8 @@
 # Arduino N64 Controller Library
 
-Based on the work in http://www.instructables.com/id/Use-an-Arduino-with-an-N64-controller/ here comes a comfortable library for usage with e.g. Arduino Uno. For NES there is already http://code.google.com/p/nespad/ . This library uses inline assembly and controllers can be attached to PIN 0 up to 13. But be aware that it's not written in best way possible. Place the folder N64Controller into your folder 'libraries'.
+Based on the work in [this guide for using Nintendo controllers with Arduinos](http://www.instructables.com/id/Use-an-Arduino-with-an-N64-controller/) here comes a comfortable library for usage with, e.g., Arduino Uno and similar CPUs. For NES there is already [nespad](http://code.google.com/p/nespad/). This library uses inline assembly. Controllers can be attached to PIN 0 up to 13. But be aware that it's not written in best way possible. To use it, search for N64 in the Library Manager. Otherwise place the folder N64Controller into your `libraries` folder or download and import it as ZIP.
 
-I used it in combination with TVout ( http://code.google.com/p/arduino-tvout/ ) and EEPROM ( http://arduino.cc/playground/Code/EEPROMWriteAnything ) for highscore I modified an existing Tetris port which itself uses Simple Tetris Clone under MIT license to be using this library here and the result is quite nice: http://pothos.blogsport.eu/files/2012/03/N64Tetris.zip
+I used it in combination with [TVout](http://code.google.com/p/arduino-tvout/) and [EEPROM](http://arduino.cc/playground/Code/EEPROMWriteAnything) for highscore saving when I modified an existing Tetris port. The port used a Simple Tetris Clone under MIT license and if you want you can see the result here which is quite nice: [N64Tetris](http://pothos.blogsport.eu/files/2012/03/N64Tetris.zip).
 
 
 ## Example code for library usage
@@ -31,10 +31,10 @@ void loop() {
 ## Wireing
 
 To use, hook up the following to the Arduino:
-Digital I/O 2: N64 serial line
-All appropriate grounding and power lines, i.e.
-GND to left N64 controller PIN, Dig.PIN2 to middle Serial/Signal,
-3.3V to right N64 PIN
+
+* Digital I/O PIN specified as parameter: Connect to N64 middle serial/signal PIN (Arduino PIN 2 is the fallback if you specify a PIN > 13)
+* Grounding GND: Connect to left N64 controller PIN
+* Power line 3.3V: Connect to right N64 controller PIN
 
 ```
    /------------\
@@ -44,11 +44,9 @@ GND to left N64 controller PIN, Dig.PIN2 to middle Serial/Signal,
 ```
 
 Maybe: connect PIN X with external 1K pull-up resistor to the 3.3V rail
-Default and fallback PIN is 2
 
 ## Authors
 
-* Gamecube controller to Nintendo 64 adapter
- by Andrew Brown
+* Gamecube controller to Nintendo 64 adapter by Andrew Brown
 * Rewritten for N64 to HID by Peter Den Hartog
 * Modified to be a library with selectable pins by Kai Lüke
