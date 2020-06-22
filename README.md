@@ -32,7 +32,7 @@ void loop() {
 
 To use, hook up the following to the Arduino:
 
-* Digital I/O PIN specified as parameter: Connect to N64 middle serial/signal PIN (Arduino PIN 2 is the fallback if you specify a PIN > 13)
+* Digital I/O PIN specified as parameter (2 is fallback if you specify a number > 13): Connect to middle N64 controler PIN for serial/signal line
 * Grounding GND: Connect to left N64 controller PIN
 * Power line 3.3V: Connect to right N64 controller PIN
 
